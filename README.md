@@ -1,0 +1,1 @@
+export PYTORCH_ALLOC_CONF=expandable_segments:True && python train.py --epochs 5 --eval-interval 1 --batch-size 3 --num-workers 4

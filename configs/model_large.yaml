@@ -1,0 +1,53 @@
+# Large Model Configuration
+# Object Detection Model with maximum parameters for best accuracy
+
+model:
+  name: "large"
+  input_size: [224, 224]
+  num_classes: 80
+
+# Enhancement Module (4 ViT blocks)
+enhancement:
+  embed_dim: 96
+  num_heads: 12
+  num_blocks: 4
+  window_size: 7
+  img_size: [224, 224]
+  mlp_ratio: 4.0
+  cardinality: 32
+  base_width: 4
+  resnext_type: "C"  # "B" or "C"
+  drop_path_rate: 0.1
+
+# Depth Module (4 Swin blocks)
+depth:
+  in_channels: 96
+  embed_dim: 128
+  out_channels: 192
+  input_resolution: [56, 56]
+  depth: 4
+  num_heads: 12
+  window_size: 7
+  mlp_ratio: 4.0
+  drop_path_rate: 0.1
+
+# Feature Evolution Subnetwork
+evolution:
+  in_channels: 192
+  encoding_channels: [192, 384, 768]
+  decoding_channels: [384, 192, 96]
+  out_channels: 384
+
+# Detection Head
+detection:
+  num_classes: 80
+  num_anchors: 9
+  in_channels_list: [192, 384, 768]
+
+# Training parameters
+training:
+  batch_size: 8
+  learning_rate: 0.0003
+  epochs: 300
+  weight_decay: 0.0005
+  momentum: 0.9

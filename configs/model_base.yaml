@@ -1,0 +1,53 @@
+# Base Model Configuration
+# Object Detection Model with standard parameters for production use
+
+model:
+  name: "base"
+  input_size: [224, 224]
+  num_classes: 80
+
+# Enhancement Module (3 ViT blocks)
+enhancement:
+  embed_dim: 64
+  num_heads: 8
+  num_blocks: 3
+  window_size: 7
+  img_size: [224, 224]
+  mlp_ratio: 4.0
+  cardinality: 32
+  base_width: 4
+  resnext_type: "C"  # "B" or "C"
+  drop_path_rate: 0.1
+
+# Depth Module (3 Swin blocks)
+depth:
+  in_channels: 64
+  embed_dim: 96
+  out_channels: 128
+  input_resolution: [56, 56]
+  depth: 3
+  num_heads: 8
+  window_size: 7
+  mlp_ratio: 4.0
+  drop_path_rate: 0.1
+
+# Feature Evolution Subnetwork
+evolution:
+  in_channels: 128
+  encoding_channels: [128, 256, 512]
+  decoding_channels: [256, 128, 64]
+  out_channels: 256
+
+# Detection Head
+detection:
+  num_classes: 80
+  num_anchors: 9
+  in_channels_list: [128, 256, 512]
+
+# Training parameters
+training:
+  batch_size: 16
+  learning_rate: 0.0005
+  epochs: 200
+  weight_decay: 0.0005
+  momentum: 0.9

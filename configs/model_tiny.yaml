@@ -1,0 +1,53 @@
+# Tiny Model Configuration
+# Object Detection Model with minimal parameters for fast training/inference
+
+model:
+  name: "tiny"
+  input_size: [224, 224]
+  num_classes: 80
+
+# Enhancement Module (3 ViT blocks)
+enhancement:
+  embed_dim: 32
+  num_heads: 4
+  num_blocks: 2
+  window_size: 7
+  img_size: [224, 224]
+  mlp_ratio: 4.0
+  cardinality: 16
+  base_width: 4
+  resnext_type: "C"  # "B" or "C"
+  drop_path_rate: 0.1
+
+# Depth Module (3 Swin blocks)
+depth:
+  in_channels: 32
+  embed_dim: 48
+  out_channels: 64
+  input_resolution: [56, 56]
+  depth: 2
+  num_heads: 4
+  window_size: 7
+  mlp_ratio: 4.0
+  drop_path_rate: 0.1
+
+# Feature Evolution Subnetwork
+evolution:
+  in_channels: 64
+  encoding_channels: [64, 128, 256]
+  decoding_channels: [128, 64, 32]
+  out_channels: 128
+
+# Detection Head
+detection:
+  num_classes: 80
+  num_anchors: 9
+  in_channels_list: [64, 128, 256]
+
+# Training parameters
+training:
+  batch_size: 32
+  learning_rate: 0.001
+  epochs: 100
+  weight_decay: 0.0005
+  momentum: 0.9

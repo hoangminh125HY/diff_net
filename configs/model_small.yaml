@@ -1,0 +1,53 @@
+# Small Model Configuration
+# Object Detection Model with balanced parameters for good performance
+
+model:
+  name: "small"
+  input_size: [224, 224]
+  num_classes: 80
+
+# Enhancement Module (3 ViT blocks)
+enhancement:
+  embed_dim: 48
+  num_heads: 6
+  num_blocks: 3
+  window_size: 7
+  img_size: [224, 224]
+  mlp_ratio: 4.0
+  cardinality: 24
+  base_width: 4
+  resnext_type: "C"  # "B" or "C"
+  drop_path_rate: 0.1
+
+# Depth Module (3 Swin blocks)
+depth:
+  in_channels: 48
+  embed_dim: 64
+  out_channels: 96
+  input_resolution: [56, 56]
+  depth: 3
+  num_heads: 6
+  window_size: 7
+  mlp_ratio: 4.0
+  drop_path_rate: 0.1
+
+# Feature Evolution Subnetwork
+evolution:
+  in_channels: 96
+  encoding_channels: [96, 192, 384]
+  decoding_channels: [192, 96, 48]
+  out_channels: 192
+
+# Detection Head
+detection:
+  num_classes: 80
+  num_anchors: 9
+  in_channels_list: [96, 192, 384]
+
+# Training parameters
+training:
+  batch_size: 24
+  learning_rate: 0.0008
+  epochs: 150
+  weight_decay: 0.0005
+  momentum: 0.9
