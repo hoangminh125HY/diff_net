@@ -89,44 +89,40 @@ class FeatureEvolutionSubnetwork(nn.Module):
 
         super().__init__()
 
-        # ===== Backbone =====
-        self.transformation = ResNetBackbone(
-            arch=backbone,
-            return_indices=(1,2,3),  # C3 C4 C5
-            freeze_indices=()
-        )
+        # ===== Backbone (NEW) =====
+        self.transformation = ResNetBackbone(backbone, pretrained=True)
 
-        # lấy channels thật từ backbone
-        self.out_channels = self.transformation.num_channels
-        backbone_out = self.out_channels[-1]
+        # channels từ backbone
+        backbone_channels = self.transformation.out_channels   # [c3,c4,c5]
 
-        # ===== Feature align (C3,C4,C5 → 64,128,256 cho head cũ) =====
+        # ===== Align channels cho detection head =====
         self.align = nn.ModuleList([
             nn.Conv2d(c, o, 1)
-            for c, o in zip(self.out_channels, encoding_channels)
+            for c, o in zip(backbone_channels, encoding_channels)
         ])
 
         # ===== Decoder =====
         self.recovery = RecoveryModule(
-            encoded_channels=backbone_out,
+            encoded_channels=backbone_channels[-1],
             hidden_channels=decoding_channels,
             out_channels=out_channels
         )
 
+    # -----------------------------------------------------
+
     def forward(self, x):
 
-        # Backbone features
-        features_dict = self.transformation(x)
-        backbone_features = list(features_dict.values())
+        # backbone -> list [c3,c4,c5]
+        backbone_features = self.transformation(x)
 
-        # Align channels cho detection head
+        # align channel cho head detect
         encoding_features = [
             conv(f) for conv, f in zip(self.align, backbone_features)
         ]
 
         encoded = backbone_features[-1]
 
-        # Decode ảnh
+        # reconstruct image
         decoding_features, output = self.recovery(encoded)
 
         return output, encoding_features, decoding_features
@@ -134,20 +130,16 @@ class FeatureEvolutionSubnetwork(nn.Module):
     # -----------------------------------------------------
 
     def encode(self, x):
-        """Only encoder"""
-        features_dict = self.transformation(x)
-        backbone_features = list(features_dict.values())
-
+        backbone_features = self.transformation(x)
         encoding_features = [
             conv(f) for conv, f in zip(self.align, backbone_features)
         ]
-
         return encoding_features[-1]
 
     # -----------------------------------------------------
 
     def decode(self, encoded):
-        """Only decoder"""
         _, output = self.recovery(encoded)
         return output
+
 
